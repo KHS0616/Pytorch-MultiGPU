@@ -48,6 +48,7 @@ self.gpu_ids = [2, 3]
 # GPU 개수 등의 정보 저장
 size = len(self.gpu_ids)
 ```
+- GPU의 개수 만큼 프로세스를 생성할 예정  
 
 4. Train 데이터 리스트를 변수에 저장하고 DataPartitioner 객체를 생성한다.  
 ```python
@@ -57,7 +58,9 @@ self.train_dataset = [os.path.join(self.opt.train_file, x) for x in os.listdir(s
 # 데이터 셋 설정
 partition_sizes = [1.0 / size for _ in range(size)]
 self.partition = DataPartitioner(self.train_dataset, partition_sizes)
-```
+```  
+- 데이터를 분할하기 위해 데이터 리스트를 미리 저장한다.  
+- 데이터 분할은 DataPartitioner 클래스에서 진행  
 
 5. 프로세스를 생성하고 실행 시킨다.  
 ```python
@@ -86,6 +89,7 @@ def init_process(self, rank, size, backend="gloo"):
     # 학습 프로세스 실행
     self.run(rank, size)
 ```
+- 포트번호는 임의로 설정할 수 있다.  
 
 7. Train 진행 중 Loss 역전파 완료 후 각 프로세스간 파라미터 공유
 ```python
@@ -105,3 +109,5 @@ def average_gradients(model):
         dist.all_reduce(param.grad.data, op=dist.ReduceOp.SUM)
         param.grad.data /= size
 ```
+- torch.distributed.all_reduce 메소드로 그룹 내 전체 프로세스의 계산을 수행한다.  
+- op 파라미터로 연산 유형을 지정한다.
