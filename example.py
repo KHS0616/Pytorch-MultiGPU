@@ -346,7 +346,7 @@ class Train():
                 writer.add_scalar("lpips/test", lpips.avg, epoch)
             
             """  Best 모델 저장 """
-            if lpips.avg > best_lpips:
+            if lpips.avg < best_lpips:
                 best_lpips = lpips.avg
                 torch.save(
                     generator.state_dict(), os.path.join(self.opt.outputs_dir, 'best_g.pth')
